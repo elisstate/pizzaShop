@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Implementation-Title: shop
+Implementation-Version: 0.0.1-SNAPSHOT
+Built-By: T0202404
+Implementation-Vendor-Id: com.pizza
+Build-Jdk: 1.8.0_131
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-bo
+ ot-starter-parent/shop
+Created-By: Maven Integration for Eclipse
+

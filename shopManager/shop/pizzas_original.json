@@ -1,0 +1,53 @@
+[
+    {
+        "price": "21",
+        "name": "Prosciutto",
+        "toppings": [
+            "cheese",
+            "prosciutto",
+            "tomatoes",
+            "olives",
+            "mushrooms"
+        ],
+        "id": "1",
+        "base": [
+            {
+                "name": "normal",
+                "id": "1"
+            },
+            {
+                "name": "thin",
+                "id": "2"
+            },
+            {
+                "name": "pan crust",
+                "id": "3"
+            }
+        ]
+    },
+    {
+        "price": "18",
+        "name": "Margherita",
+        "toppings": [
+            "cheese",
+            "tomatoes",
+            "olives",
+            "onions"
+        ],
+        "id": "2",
+        "base": [
+            {
+                "name": "normal",
+                "id": "1"
+            },
+            {
+                "name": "thin",
+                "id": "2"
+            },
+            {
+                "name": "pan crust",
+                "id": "3"
+            }
+        ]
+    }
+]
