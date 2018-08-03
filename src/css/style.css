@@ -1,0 +1,130 @@
+
+.pizzaMenu {
+
+    margin: auto !important;
+    margin-top: 200px !important;
+    position: relative;
+    text-indent: 5px;
+    max-width: 1200px;
+    overflow-y: auto !important;
+    
+}
+
+
+.loginBox {
+      margin: auto !important;
+      max-width: 400px;
+      min-height: 300px;
+      margin-top: 150px !important;
+  
+}
+
+.loginContent {
+    margin: auto !important;
+    display:block !important;
+    margin-bottom: 20px !important;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    width: 300px !important;
+    background-color: transparent !important;
+}
+
+
+.loginContent>input:focus+div>hr {
+  border-bottom: 2px solid #aa5408 !important;
+}
+
+
+
+.addPizza {
+
+    align-items: center !important;  
+    text-align: center !important;
+    margin-top: 50px !important;
+
+}
+
+
+.HeaderComp {
+    background-image: url("pizzaHeader.jpg");
+    background-repeat: no-repeat;
+    background-position: center top;
+    padding: 0px !important;
+    background-color: #5b0808 !important;
+    height: 200px !important;       
+}
+
+
+.modalTitle {
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 0px 0px !important;
+
+    background-color: #edb138;
+
+
+    border-bottom: 0.2px  !important;
+    border-style: solid  !important;
+    border-color: black  !important;
+}
+
+
+
+.Toppings {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;  
+}
+
+
+.cartNoItems {
+    margin-top: 100px !important;
+    margin: auto;
+    text-align: center;
+    font-size: 30px;
+}
+
+
+.mainTitle {
+    padding-top: 100px;
+    font-size: 40px;
+    margin-left: auto;
+    text-align: center;
+    font-family: "Cambria", Times, serif
+}
+
+
+.orderList {
+    text-align: right;
+}
+
+.headerOrderList {
+
+    background-color:#edb138;
+    text-align: left;
+
+}
+
+
+.cellTable {
+    font-size: 20px !important;
+    text-align: left !important;
+    width: auto!important;
+    font-family: "Cambria", Times, serif;
+}
+
+.cellFooter {
+    font-size: 20px !important;
+    text-align: left !important;
+    width: auto!important;
+    font-family: "Cambria", Times, serif;
+    padding-left: 90px!important;
+    padding-bottom: 15px;
+}
+
+
+.sendOrder {
+    margin-top: 10px;
+}
+
