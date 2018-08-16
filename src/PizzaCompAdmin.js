@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux'
 import { GridList, GridTile } from 'material-ui/GridList';
-import { IconButton, Paper, Chip, Dialog, DialogTitle, RaisedButton, TextField } from 'material-ui';
-import { FormGroup, FormControl, ControlLabel, Label } from "react-bootstrap";
+import { IconButton, Paper, Chip, Dialog, RaisedButton } from 'material-ui';
+import { FormGroup, ControlLabel } from "react-bootstrap";
 import AddIcon from 'material-ui/svg-icons/content/add-circle';
 import CloseIcon from 'material-ui/svg-icons/navigation/close';
 import EditIcon from 'material-ui/svg-icons/image/edit';
@@ -29,6 +29,8 @@ class PizzaComp extends React.Component {
             newPrice: this.props.pizza.price,
             editMode: false
         }
+
+
         this.handleAddToCart = this.handleAddToCart.bind(this)
         this.selectBase = this.selectBase.bind(this)
         this.modalOnClose = this.modalOnClose.bind(this)
@@ -45,7 +47,7 @@ class PizzaComp extends React.Component {
                 modalTitle: "Login"
             })
         } else {
-            if (this.props.currentBase.baseSelected == false ||
+            if (this.props.currentBase.baseSelected === false ||
                 this.props.pizza.id !== this.props.currentBase.id) {
                 this.setState({
                     modalShow: true,
@@ -71,13 +73,15 @@ class PizzaComp extends React.Component {
 
     setEditMode() {
 
-    this.setState({
-        editMode: !this.state.editMode
-    });
-        
+        this.setState({
+            editMode: !this.state.editMode
+        });
     }
 
     sendChanges(event) {
+        this.setState({
+            modalShow: false
+        })
 
         let toSend = {
             name: this.state.newName,
@@ -87,18 +91,24 @@ class PizzaComp extends React.Component {
             id: this.props.pizza.id
         }
 
-        axios.post(`http://localhost:4000/menuModify/pizza`, toSend);
-
-        this.setState({
-            modalText: "Your changes have been saved!",
-            modalTitle: "Confirmation",
-            editMode: false,
-            modalShow: false
-        })
+        axios.post(`http://localhost:4000/menuModify/pizza`, toSend)
+            .then(response => {
+                this.setState({
+                    editMode: false
+                })
+            }, err => {
+                this.setState({
+                    modalText: "There has been an error, please try again",
+                    modalTitle: "Error",
+                    modalShow: true,
+                    editMode: false
+                })
+            })
     }
 
     sendDeleteId() {
-        axios.post(`http://localhost:4000/menuModify/removePizza`, this.props.pizza.id);
+        axios.post(`http://localhost:4000/menuModify/removePizza`,
+            this.props.pizza.id);
         this.setState({
             editMode: false,
             modalShow: false
@@ -173,7 +183,7 @@ class PizzaComp extends React.Component {
     }
 
     modalForSave() {
-         if (this.state.editMode === true) {
+        if (this.state.editMode === true) {
             this.setState({
                 modalShow: true,
                 modalText: "Do you want to save the changes for Pizza "
@@ -208,9 +218,10 @@ class PizzaComp extends React.Component {
                             }}
                             onChange={this.handleRename.bind(this)} />
                         )}
+
                 subtitle={
                     this.state.editMode === false ? (
-                        this.props.pizza.price
+                       <div>{this.props.pizza.price} lei </div>
                     ) :
                         (<input value={this.state.newPrice}
                             style={{
@@ -221,87 +232,86 @@ class PizzaComp extends React.Component {
                             onChange={this.handleModifyPrice.bind(this)} />
                         )}
                 actionIcon={
+                    loginState.getUsername() === "admin" &&
                     <div style={{ display: "flex" }}>
-                        {loginState.getUsername() === "admin" &&
+                        {this.state.editMode === false ? (
                             <div>
-                                {this.state.editMode === false ? (
-                                    <div>
-                                        <IconButton tooltip="Add to shopping cart"
-                                            tooltipPosition="top-left"
-                                            onClick={this.handleAddToCart} >
-                                            <AddIcon color="#edb138" />
-                                        </IconButton>
+                                <IconButton tooltip=
+                                    "Add to shopping cart"
+                                    tooltipPosition="top-left"
+                                    onClick={this.handleAddToCart} >
+                                    <AddIcon color="#edb138" />
+                                </IconButton>
 
-                                        <IconButton tooltip="Edit"
-                                            tooltipPosition="top-left"
-                                            onClick={this.setEditMode} >
-                                            <EditIcon color="#edb138" />
-                                        </IconButton>
-                                    </div>
-                                ) : (
-                                        <div>
-                                            <IconButton tooltip="Save changes"
-                                                className="Save changes"
-                                                tooltipPosition="top-left"
-                                                onClick={this.modalForSave.bind(this)}>
-                                                <SaveIcon color="#edb138" />
-                                            </IconButton>
-
-                                            <IconButton tooltip="Delete from menu"
-                                                className="Delete"
-                                                tooltipPosition="top-left"
-                                                onClick={this.modalForDelete.bind(this)}>
-                                                <DeleteIcon color="#edb138" />
-                                            </IconButton>
-                                        </div>
-                                    )
-                                }
+                                <IconButton tooltip="Edit"
+                                    tooltipPosition="top-left"
+                                    onClick={this.setEditMode} >
+                                    <EditIcon color="#edb138" />
+                                </IconButton>
                             </div>
+                        ) : (
+                                <div>
+                                    <IconButton tooltip="Save changes"
+                                        className="Save changes"
+                                        tooltipPosition="top-left"
+                                        onClick=
+                                        {this.modalForSave.bind(this)}>
+                                        <SaveIcon color="#edb138" />
+                                    </IconButton>
+
+                                    <IconButton tooltip="Delete from menu"
+                                        className="Delete"
+                                        tooltipPosition="top-left"
+                                        onClick={this.modalForDelete.bind(this)}>
+                                        <DeleteIcon color="#edb138" />
+                                    </IconButton>
+                                </div>
+                            )
                         }
                     </div>
-                } >
+                }>
 
                 {
                     <Dialog title={
-                    <div className="modalTitle"
-                        style={{ border: 0, backgroundColor: "#edb138" }}>
-                        <h5 style={{ margin: 10, padding: 0 }}>
-                            {this.state.modalTitle}
-                        </h5>
-                        <IconButton onClick={this.modalOnClose}>
-                            <CloseIcon />
-                        </IconButton>
-                    </div>
-                }
-                    aria-labelledby="simple-dialog-title"
-                    open={this.state.modalShow}
-                    style={{textAlign:"center"}}>
-                    <h2>
-                        {this.state.modalText}
-                    </h2>
-                    {this.state.editMode === true &&
-                        <div>
-                            { this.state.modalTitle === "Save Changes" ? (
-                            <RaisedButton
-                                onClick={this.sendChanges}
-                                style={{marginRight:"20"}}>
-                                Yes
-                            </RaisedButton>
-                            ) : (
-                                 <RaisedButton
-                                onClick={this.sendDeleteId}
-                                style={{marginRight:"20"}}>
-                                Yes
-                            </RaisedButton>
-                            )
-                            }
-                            <RaisedButton
-                                onClick={this.initialValues.bind(this)}>
-                                No
-                            </RaisedButton>
+                        <div className="modalTitle"
+                            style={{ border: 0, backgroundColor: "#edb138" }}>
+                            <h5 style={{ margin: 10, padding: 0 }}>
+                                {this.state.modalTitle}
+                            </h5>
+                            <IconButton onClick={this.modalOnClose}>
+                                <CloseIcon />
+                            </IconButton>
                         </div>
                     }
-                </Dialog>
+                        aria-labelledby="simple-dialog-title"
+                        open={this.state.modalShow}
+                        style={{ textAlign: "center" }}>
+                        <h2>
+                            {this.state.modalText}
+                        </h2>
+                        {this.state.editMode === true &&
+                            <div>
+                                {this.state.modalTitle === "Save Changes" ? (
+                                    <RaisedButton
+                                        onClick={this.sendChanges}
+                                        style={{ marginRight: "20" }}>
+                                        Yes
+                                    </RaisedButton>
+                                ) : (
+                                        <RaisedButton
+                                            onClick={this.sendDeleteId}
+                                            style={{ marginRight: "20" }}>
+                                            Yes
+                                        </RaisedButton>
+                                    )
+                                }
+                                <RaisedButton
+                                    onClick={this.initialValues.bind(this)}>
+                                    No
+                                </RaisedButton>
+                            </div>
+                        }
+                    </Dialog>
                 }
 
                 <Paper zDepth={1}>
@@ -310,7 +320,7 @@ class PizzaComp extends React.Component {
                             <div>
                                 <div className="Toppings">  Bases:
                          {this.props.pizza.base.map((base) =>
-                                        <Chip style={{margin:5}}
+                                        <Chip style={{ margin: 5 }}
                                             onClick={(evt) =>
                                                 this.selectBase(evt, this.props.pizza.id)}
                                             key={base.id}
@@ -321,7 +331,7 @@ class PizzaComp extends React.Component {
                                 </div>
 
                                 <div className="Toppings">  Toppings:
-                            {this.props.pizza.toppings.map((topping, index) =>
+                        {this.props.pizza.toppings.map((topping, index) =>
                                         <Chip style={{ margin: 5 }}
                                             key={index}
                                         >
@@ -354,15 +364,14 @@ class PizzaComp extends React.Component {
                                             style={{ minWidth: "750" }}
                                         />
                                     </FormGroup>
-
                                 </div>
                             )
                     }
                 </Paper>
                 {id <= 3 ? (
-                    <img src={require('./css/pizzaPics/' + id + '.jpg')} />
+                    <img src={'/pizzaPics/' + id + '.jpg'} />
                 ) : (
-                    <img src={require('./css/pizzaPics/general.png')} />
+                        <img src={'/pizzaPics/general.png'} />
                     )
                 }
             </GridTile>

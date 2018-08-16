@@ -1,29 +1,26 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { GridList, GridTile } from 'material-ui/GridList';
 import { FormGroup } from 'react-bootstrap';
-import { IconButton, Paper, Chip, Typography, Icon, RaisedButton, TextField }
-    from 'material-ui';
+import { Paper, RaisedButton, TextField } from 'material-ui';
 import {
     Table,
     TableBody,
-    TableHeader,
-    TableHeaderColumn,
     TableRow,
     TableRowColumn,
     TableFooter,
 } from 'material-ui/Table';
+import { Stepper, Step, StepLabel, StepContent } from 'material-ui/Stepper';
 import SendIcon from 'material-ui/svg-icons/content/send';
+
 import './css/style.css';
-import PizzaCompOrder from './PizzaCompOrder';
-import pizzas from './pizzas.json'
-import * as pizzaOrderActions from "./actions/pizzaOrderAction.js"
-import { Button } from "react-bootstrap";
-import { Stepper, Step, StepButton, StepLabel, StepContent }
-    from 'material-ui/Stepper';
-import * as shoppinCartState from "./lib/shoppingCartStorage.js"
+import * as loginState from "./lib/loginState.js"
+import PizzaCompOrder from './ShoppingCartComp';
+import * as pizzaOrderActions from "./actions/pizzaOrderAction.js";
+import * as loginActions from "./actions/loginActions.js";
+import * as shoppinCartState from "./lib/shoppingCartStorage.js";
+import axios from 'axios';
 
 
 function getOrderSteps() {
@@ -41,8 +38,6 @@ class ShoppingCart extends React.Component {
         let currentHour = "".concat(date.getHours())
         currentHour = currentHour.concat(":");
         currentHour = currentHour.concat(date.getMinutes());
-
-
 
         this.state = {
             currentHour: currentHour,
@@ -66,10 +61,8 @@ class ShoppingCart extends React.Component {
 
     componentWillMount() {
         if (this.props.shoppingCartPizzas != null)
-            this.props.pizzaOrderActions.calculateTotal(this.props.shoppingCartPizzas);
+            this.props.actions.pizzaOrderActions.calculateTotal(this.props.shoppingCartPizzas);
     }
-
-   
 
     handleNextStep() {
         this.setState({
@@ -95,33 +88,51 @@ class ShoppingCart extends React.Component {
         })
     }
 
+    handleSendData() {
+        let data = {
+            pizzas: this.props.shoppingCartPizzas,
+            clientData: this.state.clientData,
+            email: loginState.getUsername()
+        }
+        axios.post(`http://localhost:4000/orders/newOrder`, data);
+
+        this.props.actions.pizzaOrderActions.cleanCart();
+    }
 
     handleClientDataUpdate(event, index) {
-        switch(index) {
+        switch (index) {
             case 0:
                 this.setState({
-                    clientData: {...this.state.clientData,
-                        name: event.target.value}
+                    clientData: {
+                        ...this.state.clientData,
+                        name: event.target.value
+                    }
                 });
                 break;
             case 1:
                 this.setState({
-                    clientData: {...this.state.clientData,
-                        address: event.target.value}
+                    clientData: {
+                        ...this.state.clientData,
+                        address: event.target.value
+                    }
                 });
                 break;
             case 2:
                 this.setState({
-                    clientData: {...this.state.clientData,
-                        phoneNumber: event.target.value}
+                    clientData: {
+                        ...this.state.clientData,
+                        phoneNumber: event.target.value
+                    }
                 });
                 break;
             case 3:
-                if (this.state.currentHour < event.target.value)
                 this.setState({
-                    clientData: {...this.state.clientData,
-                        hourArrival: event.target.value}
+                    clientData: {
+                        ...this.state.clientData,
+                        hourArrival: event.target.value
+                    }
                 });
+
                 break;
             default:
                 return;
@@ -133,40 +144,45 @@ class ShoppingCart extends React.Component {
             case 0:
                 return (
                     <FormGroup controlId="name" >
-                        <TextField placeholder="FirstName LastName"
+                        <TextField
+                            placeholder="FirstName LastName"
                             name="name" autoFocus
-                            className="loginContent"
-                            onChange = {(e) => this.handleClientDataUpdate(e, index)}
-                            value = {this.state.clientData.name}
-                         />
+                            className="sendOrderContent"
+                            onChange={(e) => this.handleClientDataUpdate(e, index)}
+                            value={this.state.clientData.name}
+                        />
+
                     </FormGroup>
                 );
             case 1:
                 return (
                     <FormGroup controlId="address"  >
-                        <TextField placeholder="Address of delivery"
+                        <TextField
+                            placeholder="Address of delivery"
                             name="address" autoFocus
-                            className="loginContent"
-                            onChange = {(e) => this.handleClientDataUpdate(e, index)}
-                            value = {this.state.clientData.address}
+                            className="sendOrderContent"
+                            onChange={(e) => this.handleClientDataUpdate(e, index)}
+                            defaultValue={this.state.clientData.address}
                         />
-                            
                     </FormGroup>
                 );
             case 2:
                 return (
                     <FormGroup controlId="phoneNumber"  >
-                        <TextField placeholder="Phone number"
+                        <TextField
+                            placeholder="Phone number"
                             name="phoneNumber" autoFocus
-                            className="loginContent"
-                            onChange = {(e) => this.handleClientDataUpdate(e, index)}
-                            value = {this.state.clientData.phoneNumber}
+                            className="sendOrderContent"
+                            onChange={(e) => this.handleClientDataUpdate(e, index)}
+                            value={this.state.clientData.phoneNumber}
                         />
                     </FormGroup>
                 );
             case 3:
                 return (
-                    <FormGroup controlId="hour"  >
+                    <FormGroup
+                        controlId="hour"
+                    >
                         <div> Please note that the fastest hour of delivery is
                             40 minutes from the current time
                         </div>
@@ -175,49 +191,60 @@ class ShoppingCart extends React.Component {
                             placeholder="Hour for your delivery"
                             name="hour"
                             autoFocus
-                            className="loginContent"
+                            className="sendOrderContent"
                             type="time"
                             InputLabelProps={{ shrink: true }}
                             inputProps={{ step: 300 }}
-                            value = {this.state.clientData.hourArrival }
-                            onChange = {(e) => this.handleClientDataUpdate(e, index)}
+                            value={this.state.clientData.hourArrival}
+                            onChange={(e) => this.handleClientDataUpdate(e, index)}
                         />
                     </FormGroup>
                 );
             case 4:
                 return (
-                    <RaisedButton style={{ marginTop: "250" }} 
+                    <RaisedButton
+                        style={{ marginTop: "250", maxWidth: "200" }}
                         className="loginContent"
+                        onClick={this.handleSendData.bind(this)}
                     >
                         Send Order
                     </RaisedButton>
                 );
+            default:
+                return (<br />);
         }
     }
 
     render() {
         const steps = getOrderSteps();
-        console.log( this.props.shoppingCartPizzas)
-        return (
 
+        return (
             <div>
                 {this.props.shoppingCartPizzas.length === 0 ? (
-
-                    <Paper className="cartNoItems" style={{ width: "400" }} >
+                    <Paper
+                        className="cartNoItems"
+                        style={{ width: "400" }}
+                    >
                         There are no products <br /> in the shopping cart!
-                        </Paper>
+                    </Paper>
                 ) : (
-                        <div className="pizzaMenu">
-                            <h2 className="mainTitle"> Your order </h2>
+                        <div className="shoppingCart">
+                            <h2 className="mainTitle">
+                                Your order
+                            </h2>
                             <Paper>
-                                <Table bodyStyle={{ overflow: 'visible' }}
-                                    style={{ tableLayout: 'auto' }}
+                                <Table
+                                    bodyStyle={{ overflow: 'visible' }}
+                                    style={{ tableLayout: 'auto'}}
                                     fixedHeader={false}>
                                     <TableBody displayRowCheckbox={false}>
-                                        <TableRow className="headerOrderList"
-                                            key="42">
+                                        <TableRow
+                                            className="headerOrderList"
+                                            key="42"
+                                            style = {{color: "white"}}
+                                        >
                                             <TableRowColumn />
-                                            <TableRowColumn className="cellTable" >
+                                            <TableRowColumn className="cellTable">
                                                 Pizza type
                                             </TableRowColumn>
                                             <TableRowColumn className="cellTable">
@@ -229,10 +256,10 @@ class ShoppingCart extends React.Component {
                                             <TableRowColumn className="cellTable">
                                                 Pieces ordered
                                             </TableRowColumn>
-                                            <TableRowColumn/>
+                                            <TableRowColumn />
                                         </TableRow>
                                         {
-                                           this.props.shoppingCartPizzas.map((pizza2) => (
+                                            this.props.shoppingCartPizzas.map((pizza2) => (
                                                 <PizzaCompOrder pizza={pizza2} />
                                             ))
                                         }
@@ -240,8 +267,9 @@ class ShoppingCart extends React.Component {
                                     </TableBody>
                                     <TableFooter displayRowCheckbox={false}>
                                         <TableRow>
-                                            <TableRowColumn className="cellFooter"> 
-                                                Total price of your order: 
+                                            <TableRowColumn
+                                                className="cellFooter">
+                                                Total price of your order:
                                                 {this.props.orderTotal} lei
                                             </TableRowColumn>
                                         </TableRow>
@@ -249,52 +277,60 @@ class ShoppingCart extends React.Component {
                                 </Table>
                             </Paper>
 
-                            <RaisedButton className="sendOrder"
+                            <RaisedButton className="sendOrderButton"
                                 label="Finalize order"
                                 icon={<SendIcon />}
                                 labelPosition="after"
                                 primary={true}
-                                labelColor="#96450f"
+                                color="#96450f"
                                 backgroundColor="#edb138"
                                 onClick={this.handleSendOrder}
                             />
 
-                            {this.state.orderForm == true &&
+                            {this.state.orderForm === true &&
                                 <div>
-                                    <Stepper activeStep={this.state.activeStep}
-                                        orientation="vertical">
+                                    <Stepper
+                                        activeStep={this.state.activeStep}
+                                        orientation="vertical"
+                                    >
                                         {steps.map((label, index) => {
                                             return (
-                                                <Step key={label}>
-                                                    <StepLabel> {label} </StepLabel>
+                                                <Step
+                                                    className="stepper"
+                                                    key={label}
+                                                >
+                                                    <StepLabel>
+                                                        {label}
+                                                    </StepLabel>
 
                                                     <StepContent>
                                                         {this.getOrderFields(index)}
                                                         <RaisedButton
-                                                        disabled={this.state.activeStep === 0}
-                                                        onClick={this.handleBackStep}
+                                                            disabled=
+                                                            {this.state.activeStep === 0}
+                                                            onClick={this.handleBackStep}
                                                         >
                                                             Back
-                                                        </RaisedButton>
-                                                        <RaisedButton onClick={this.handleNextStep}
-                                                            
-                                                        >
-                                                            {this.state.activeStep === steps.length - 1 
-                                                                ? "Send Order" :
-                                                                "Next"}
-                                                        </RaisedButton>
+                                                    </RaisedButton>
+
+                                                        {this.state.activeStep <
+                                                            steps.length - 1
+                                                            &&
+                                                            <RaisedButton
+                                                                onClick=
+                                                                {this.handleNextStep}
+                                                            >
+                                                                Next
+                                                    </RaisedButton>
+                                                        }
                                                     </StepContent>
                                                 </Step>
                                             );
                                         })}
                                     </Stepper>
-                                    { this.state.activeStep === steps.length && 
+                                    {this.state.activeStep === steps.length &&
                                         <div>
                                             <h3> Your order has been sent </h3>
-                                            <RaisedButton onClick={this.handleReset}>
-                                                Reset
-                                            </RaisedButton>
-
                                         </div>
                                     }
                                 </div>
@@ -312,12 +348,15 @@ function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-   return {
-        pizzaOrderActions: bindActionCreators(pizzaOrderActions, dispatch)
+    return {
+        actions: {
+            loginActions: bindActionCreators(loginActions, dispatch),
+            pizzaOrderActions: bindActionCreators(pizzaOrderActions, dispatch)
+        }
     };
 }
 
 export default connect(
     mapStateToProps,
     mapDispatchToProps
-)  (ShoppingCart);
+)(ShoppingCart);

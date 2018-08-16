@@ -1,14 +1,11 @@
-import React, { Component } from 'react';
-import { Button, FormGroup, FormControl, ControlLabel, Row, Col } from "react-bootstrap";
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
-
+import React from 'react';
+import { FormGroup } from "react-bootstrap";
+import { Link } from 'react-router-dom';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
-import Paper from 'material-ui/Paper';
 import Card from 'material-ui/Card';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import LoginIcon from 'material-ui/svg-icons/action/account-circle'
 import * as loginState from "./lib/loginState.js"
 import * as loginActions from "./actions/loginActions.js"
 
@@ -44,7 +41,8 @@ class Login extends React.Component {
     }
 
     validateForm() {
-        return this.state.username.length > 0 && this.state.password.length > 0;
+        return this.state.username.length > 0 &&
+            this.state.password.length > 0;
     }
 
     render() {
@@ -60,46 +58,61 @@ class Login extends React.Component {
                     <FormGroup controlId="user" className="loginInput">
 
                         <TextField label="username"
-                            placeholder="E-mail" name="user"
-                            autoFocus type="textarea"
+                            placeholder="E-mail"
+                            name="user"
+                            autoFocus
+                            type="textarea"
                             value={this.state.username}
                             onChange={this.handleChangeUsername}
                             className="loginContent" 
                         />
                     </FormGroup>
                     <br />
-                    <FormGroup controlId="password"  >
+                    <FormGroup controlId="password">
 
                         <TextField placeholder="Password"
                             name="password" autoFocus type="password"
                             value={this.state.password}
                             onChange={this.handleChangePass}
-                            className="loginContent" />
+                            className="loginContent"
+                        />
                     </FormGroup>
 
 
                     { this.validateForm() === true ? (
                         <Link to="/home">
-                            <RaisedButton className="loginContent"
+                            <RaisedButton
+                                className="loginContent"
                                 disabled={false}
                                 onClick={this.handleLogin}
-                                backgroundColor="#edb138">
+                                backgroundColor="#edb138"
+                            >
                                 Login
                         </RaisedButton>
                         </Link>
                     ) : (
-                        <RaisedButton className="loginContent"
-                            disabled={true}>
+                        <RaisedButton
+                            className="loginContent"
+                            disabled={true}
+                        >
                             Login
                         </RaisedButton>
                         )
                     }
+
+                    <Link to="\newUser">
+                        <div
+                            style = {{textAlign: "center", color: "grey"}}
+                        >
+                            Not a member? Create an account now!
+                        </div>
+                    </Link>
                 </Card>
             </div>
         );
     }
-
 }
+
 function mapStateToProps(state) {
     return state.logHandle;
 }

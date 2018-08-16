@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-
 import { Button } from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -10,6 +9,7 @@ import { Toolbar, ToolbarGroup } from 'material-ui/Toolbar';
 import CartIcon from 'material-ui/svg-icons/action/shopping-basket';
 import LogoutIcon from 'material-ui/svg-icons/action/exit-to-app'
 import LoginIcon from 'material-ui/svg-icons/action/account-circle'
+
 import * as loginState from "./lib/loginState.js"
 import * as loginActions from "./actions/loginActions.js"
 import * as pizzaOrderActions from "./actions/pizzaOrderAction.js"
@@ -30,7 +30,7 @@ class Header extends Component {
                 <Link to="/home">
                     <ToolbarGroup>
 
-                        <img src={require('./css/logo2.png')}
+                        <img src={'/logo2.png'}
                             style={{ width: '200px', height: '200px' }} />
                     </ToolbarGroup>
                 </Link>
